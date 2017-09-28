@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd  http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--Spring 配置文件，主要配置和业务逻辑有关的 -->
+    <context:component-scan base-package="com.hk">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <!--数据源，事务控制 ，xxx-->
+    <context:property-placeholder location="classpath:dbconfig.properties"/>
+    <bean id="pooledDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" >
+        <property name="jdbcUrl" value="${jdbc.jdbcUrl}?characterEncoding=utf-8"></property>
+        <property name="driverClass" value="${jdbc.driverClass}"></property>
+        <property name="user" value="${jdbc.user}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+    <!--配置与mybatis的整合-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <property name="dataSource" ref="pooledDataSource" ></property>
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+
+    </bean>
+
+    <!--配置扫描器，将mybatis 接口 的实现 加入到ioc容器中 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--扫描 所有dao接口的实现 ，加入到ioc容器中 -->
+        <property name="basePackage" value="com.hk.dao"></property>
+    </bean>
+
+    <!--配置一个可以批量执行的sqlSession-->
+    <bean   id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+            <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+            <constructor-arg name="executorType" value="BATCH" ></constructor-arg>
+    </bean>
+
+
+    <!--事务控制的配置 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="pooledDataSource" ></property>
+
+    </bean>
+
+    <!--开启基于注解的事务 -->
+
+    <aop:config >
+        <aop:pointcut id="txPoint" expression="execution(* com.hk.service..*(..))"></aop:pointcut>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint"/>
+    </aop:config>
+
+    <tx:advice id="txAdvice">
+        <tx:attributes>
+            <tx:method  name="*"/>
+            <tx:method name ="get*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+
+
+<!--spring 配置文件的核心点（数据源、与mybatis的整合，事务控制）-->
+
+
+</beans>
