@@ -19,7 +19,5 @@
 <h2>Hello World!</h2>
 值：${pageInfo}
 <button class="btn btn-primary">test</button>
-
-................
 </body>
 </html>
