@@ -11,6 +11,26 @@
     <result column="email" jdbcType="VARCHAR" property="email" />
     <result column="dept_Id" jdbcType="INTEGER" property="deptId" />
   </resultMap>
+
+  <!--带部门信息的result -->
+  <resultMap id="WithDeptBaseResultMap" type="com.hk.bean.User">
+    <id column="user_Id" jdbcType="INTEGER" property="userId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="login_Name" jdbcType="VARCHAR" property="loginName" />
+    <result column="login_Pass" jdbcType="VARCHAR" property="loginPass" />
+    <result column="age" jdbcType="INTEGER" property="age" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="dept_Id" jdbcType="INTEGER" property="deptId" />
+    <association property="department" javaType="com.hk.bean.Department">
+      <id column="dept_Id" property="deptId"></id>
+      <result column="dept_Name" property="deptName"></result>
+    </association>
+  </resultMap>
+
+
+
+
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">

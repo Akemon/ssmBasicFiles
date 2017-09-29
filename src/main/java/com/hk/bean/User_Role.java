@@ -5,7 +5,7 @@ public class User_Role {
 
     private Integer userId;
 
-    private String userRole;
+    private Integer roleId;
 
     public Integer getId() {
         return id;
@@ -23,11 +23,11 @@ public class User_Role {
         this.userId = userId;
     }
 
-    public String getUserRole() {
-        return userRole;
+    public Integer getRoleId() {
+        return roleId;
     }
 
-    public void setUserRole(String userRole) {
-        this.userRole = userRole == null ? null : userRole.trim();
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
     }
 }

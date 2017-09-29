@@ -15,7 +15,31 @@ public class User {
 
     private String email;
 
+    public Department getDepartment() {
+        return department;
+    }
+
+    public User() {
+    }
+
+    public User(Integer userId, String name, String loginName, String loginPass, Integer age, String sex, String email, Integer deptId) {
+        this.userId = userId;
+        this.name = name;
+        this.loginName = loginName;
+        this.loginPass = loginPass;
+        this.age = age;
+        this.sex = sex;
+        this.email = email;
+        this.deptId = deptId;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
+
     private Integer deptId;
+
+    private Department department;
 
     public Integer getUserId() {
         return userId;

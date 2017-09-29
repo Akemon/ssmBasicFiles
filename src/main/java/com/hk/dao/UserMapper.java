@@ -4,6 +4,8 @@ import com.hk.bean.User;
 import com.hk.bean.UserExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.ResultMap;
+import org.apache.ibatis.annotations.Select;
 
 public interface UserMapper {
     long countByExample(UserExample example);
@@ -17,6 +19,11 @@ public interface UserMapper {
     int insertSelective(User record);
 
     List<User> selectByExample(UserExample example);
+
+    //带部门信息的查询
+    @Select({"select * from tb_test_user u,tb_test_dept d where u.dept_Id=d.dept_Id"})
+    @ResultMap("WithDeptBaseResultMap")
+    List<User> selectAllUserWithDept();
 
     User selectByPrimaryKey(Integer userId);
 

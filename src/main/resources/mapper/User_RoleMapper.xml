@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.hk.bean.User_Role">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="user_Id" jdbcType="INTEGER" property="userId" />
-    <result column="user_role" jdbcType="VARCHAR" property="userRole" />
+    <result column="role_Id" jdbcType="INTEGER" property="roleId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -65,7 +65,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, user_Id, user_role
+    id, user_Id, role_Id
   </sql>
   <select id="selectByExample" parameterType="com.hk.bean.User_RoleExample" resultMap="BaseResultMap">
     select
@@ -98,9 +98,9 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.hk.bean.User_Role">
-    insert into tb_test_user_role (id, user_Id, user_role
+    insert into tb_test_user_role (id, user_Id, role_Id
       )
-    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{userRole,jdbcType=VARCHAR}
+    values (#{id,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{roleId,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.hk.bean.User_Role">
@@ -112,8 +112,8 @@
       <if test="userId != null">
         user_Id,
       </if>
-      <if test="userRole != null">
-        user_role,
+      <if test="roleId != null">
+        role_Id,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -123,8 +123,8 @@
       <if test="userId != null">
         #{userId,jdbcType=INTEGER},
       </if>
-      <if test="userRole != null">
-        #{userRole,jdbcType=VARCHAR},
+      <if test="roleId != null">
+        #{roleId,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -143,8 +143,8 @@
       <if test="record.userId != null">
         user_Id = #{record.userId,jdbcType=INTEGER},
       </if>
-      <if test="record.userRole != null">
-        user_role = #{record.userRole,jdbcType=VARCHAR},
+      <if test="record.roleId != null">
+        role_Id = #{record.roleId,jdbcType=INTEGER},
       </if>
     </set>
     <if test="_parameter != null">
@@ -155,7 +155,7 @@
     update tb_test_user_role
     set id = #{record.id,jdbcType=INTEGER},
       user_Id = #{record.userId,jdbcType=INTEGER},
-      user_role = #{record.userRole,jdbcType=VARCHAR}
+      role_Id = #{record.roleId,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -166,8 +166,8 @@
       <if test="userId != null">
         user_Id = #{userId,jdbcType=INTEGER},
       </if>
-      <if test="userRole != null">
-        user_role = #{userRole,jdbcType=VARCHAR},
+      <if test="roleId != null">
+        role_Id = #{roleId,jdbcType=INTEGER},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -175,7 +175,7 @@
   <update id="updateByPrimaryKey" parameterType="com.hk.bean.User_Role">
     update tb_test_user_role
     set user_Id = #{userId,jdbcType=INTEGER},
-      user_role = #{userRole,jdbcType=VARCHAR}
+      role_Id = #{roleId,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
