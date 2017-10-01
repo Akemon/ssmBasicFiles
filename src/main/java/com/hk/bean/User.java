@@ -104,4 +104,19 @@ public class User {
     public void setDeptId(Integer deptId) {
         this.deptId = deptId;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", name='" + name + '\'' +
+                ", loginName='" + loginName + '\'' +
+                ", loginPass='" + loginPass + '\'' +
+                ", age=" + age +
+                ", sex='" + sex + '\'' +
+                ", email='" + email + '\'' +
+                ", deptId=" + deptId +
+                ", department=" + department +
+                '}';
+    }
 }

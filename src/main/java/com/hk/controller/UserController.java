@@ -6,9 +6,11 @@ import com.github.pagehelper.PageInfo;
 import com.hk.bean.Message;
 import com.hk.bean.User;
 import com.hk.service.UserService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,7 +35,30 @@ public class UserController {
         return "index";
     }
 
+    @RequestMapping("/addUser")
+    @ResponseBody
+    public Message addUser(User user){
+        System.out.println(user.toString());
+        boolean flag =userService.addUser(user);
+        if(flag)
+        return Message.success();
+        return Message.fail();
+    }
 
+    @RequestMapping("/checkLoginName")
+    @ResponseBody
+    public Message checkLoginName(@RequestParam(value = "loginName")String loginName){
+        boolean flag =userService.checkLoginName(loginName);
+        if(flag) return Message.success();
+        return Message.fail();
+    }
+
+
+    /**
+     *
+     * @param pageNum
+     * @return
+     */
     @RequestMapping("/test")
     @ResponseBody
     public Message test123(@RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum){

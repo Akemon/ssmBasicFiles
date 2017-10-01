@@ -17,11 +17,15 @@
 </head>
 <body>
 <script type="text/javascript">
+
+
+    <!--获取所有部门-->
     function  getAllDepts() {
        $.ajax({
            url:"http://localhost:8080/getAllDepts",
            type:"POST",
            success:function (result) {
+               $('#dept_add_select').empty();
               $.each(result.extend.depts,function (index,item) {
               //    alert(item);
                 var selectOption= $("<option></option>").append(item.deptName).attr("value",item.deptId);
@@ -29,6 +33,106 @@
               })
            }
        })
+    }
+    <!--添加用户-->
+
+
+    function  addUser() {
+        var formData =($('#addUser form').serialize());
+        formData = decodeURIComponent(formData,true);
+        //检测数据的有效性
+        if(!checkEmail('#email')||!checkAge('#age')||!checkLoginName('#loginName')||!checkPass('#loginPass')){
+            alert("信息输入有误，请重新确认");
+            return false;
+        }
+        //  alert(formData);
+        $.ajax({
+            url:"http://localhost:8080/addUser",
+            type:"POST",
+            data:formData,
+            success:function (result) {
+                if(result.msg=="处理成功"){
+                    alert("添加成功");
+                }else{
+                    alert("添加失败")
+                }
+                $('#addUser').modal('hide');
+            }
+        })
+    }
+    
+    function  showValidateMessage(element,status,message) {
+     //   alert("进入检测 ");
+        $(element).parent().removeClass("has-error has-success");
+        $(element).next("span").text("");
+        if(status=="通过"){
+            $(element).parent().addClass("has-success");
+            $(element).next("span").text(message);
+        }else{
+            $(element).parent().addClass("has-error");
+            $(element).next("span").text(message);
+        }
+    }
+    function checkAge(element) {
+        var elementValue =$(element).val();
+        if(elementValue>=1&&elementValue<=150){
+            showValidateMessage(element,"通过","");
+            return true;
+        }else{
+            showValidateMessage(element,"不通过","年龄只能是一到两位的数字");
+            return false;
+        }
+
+    }
+    function checkPass(element) {
+        var elementValue =$(element).val();
+        if(elementValue!=""){
+            showValidateMessage(element,"通过","");
+            return true;
+        }else{
+            showValidateMessage(element,"不通过","密码不能为空");
+            return false;
+        }
+
+    }
+    function checkEmail(element) {
+        var elementValue =$(element).val();
+        var regxEmail =/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+        if(regxEmail.test(elementValue)){
+            showValidateMessage(element,"通过","");
+            return true;
+        }else{
+            showValidateMessage(element,"不通过","邮箱格式不正确");
+            return false;
+        }
+    }
+
+    //检查登录名是否重复
+    function  checkLoginName(element) {
+        var elementValue =$(element).val();
+        if(elementValue=="") {
+            showValidateMessage('#loginName','不通过','用户名不能为空');
+            return false;
+        }
+       // alert(elementValue);
+        var flag =false;
+        $.ajax({
+            url:"http://localhost:8080/checkLoginName",
+            data:"loginName="+elementValue,
+            type:"POST",
+            async : false,
+            success:function (result) {
+              if(result.code==100){
+                  showValidateMessage('#loginName','通过','用户名可用');
+                  flag =true;
+              }else{
+                  showValidateMessage('#loginName','不通过','用户名重复');
+                  flag =false;
+              }
+            }
+        })
+        return flag;
+
     }
 
 </script>
@@ -148,52 +252,58 @@
 
                 <form class="form-horizontal" role="form">
                     <div class="form-group">
-                        <label for="firstname" class="col-sm-2 control-label">姓名</label>
+                        <label for="name" class="col-sm-2 control-label">姓名</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="firstname" placeholder="请输入姓名">
+                            <input type="text" class="form-control" id="name" name="name" placeholder="请输入姓名">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="lastname" class="col-sm-2 control-label">用户名</label>
+                        <label for="loginName" class="col-sm-2 control-label">用户名</label>
+                        <div class="col-sm-10 ">
+                            <input type="text" class="form-control" id="loginName" name="loginName" placeholder="请输入用户名" onchange="checkLoginName('#loginName')">
+                            <span class="help-block"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPass" class="col-sm-2 control-label">密码</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="lastname" placeholder="请输入用户名">
+                            <input type="password" class="form-control" id="loginPass" name="loginPass" placeholder="请输入密码" onchange="checkPass('#loginPass')">
+                            <span class="help-block"></span>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="inputPassword" class="col-sm-2 control-label">密码</label>
+                        <label for="age" class="col-sm-2 control-label">年龄</label>
                         <div class="col-sm-10">
-                            <input type="password" class="form-control" id="inputPassword" placeholder="请输入密码">
-                        </div>
+                            <input type="text" class="form-control" id="age" name="age" placeholder="请输入年龄" onchange="checkAge('#age')">
+                            <span class="help-block"></span>
+                         </div>
+
                     </div>
 
                     <div class="form-group">
-                        <label for="lastname" class="col-sm-2 control-label">年龄</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="lastname" placeholder="请输入用户名">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="lastname" class="col-sm-2 control-label">性别</label>
+                        <label  class="col-sm-2 control-label">性别</label>
                         <label class="radio-inline  col-sm-2 col-sm-offset-1">
-                            <input type="radio" name="sex"value="option1"> 男
+                            <input type="radio" name="sex"value="男" checked="true"> 男
                         </label>
                         <label class="radio-inline col-sm-2">
-                            <input type="radio"  name="sex" value="option2"> 女
+                            <input type="radio"  name="sex" value="女"> 女
                         </label>
                     </div>
                     <div class="form-group">
-                        <label for="lastname" class="col-sm-2 control-label">邮箱</label>
+                        <label for="email" class="col-sm-2 control-label">邮箱</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="lastname" placeholder="请输入邮箱">
+                            <input type="text" class="form-control" id="email" placeholder="请输入邮箱" onchange="checkEmail('#email')">
+                            <span class="help-block"></span>
                         </div>
                     </div>
 
                     <div class="form-group" >
-                        <label for="lastname" class="col-sm-2 control-label">部门</label>
+                        <label for="dept_add_select" class="col-sm-2 control-label">部门</label>
                         <div class="col-sm-5">
-                            <select class="form-control " name="dID" id ="dept_add_select">
+                            <select class="form-control " name="deptId" id ="dept_add_select">
                             </select>
                         </div>
                     </div>
@@ -205,7 +315,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭
                 </button>
-                <button type="button" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" onclick="addUser()">
                     保存
                 </button>
             </div>
