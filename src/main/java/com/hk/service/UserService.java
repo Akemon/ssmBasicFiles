@@ -18,8 +18,8 @@ public class UserService {
      * 获取所有用户
      * @return 保存用户对象的List
      */
-    public List<User> getAllUsers() {
-        return userMapper.selectAllUserWithDept();
+    public List<User> getAllUsersWithSearch(String searchString) {
+        return userMapper.selectAllUserWithDept(searchString);
 
     }
 
@@ -45,5 +45,32 @@ public class UserService {
         criteria.andLoginNameEqualTo(loginName);
         long count =userMapper.countByExample(userExample);
         return count==0;
+    }
+
+    /**
+     * 通过 ID获取该用户的详细信息
+     * @param id
+     * @return
+     */
+    public User getUser(Integer id) {
+        User user =userMapper.selectByPrimaryKey(id);
+        return user;
+    }
+
+    public void updateUser(User user) {
+       userMapper.updateByPrimaryKeySelective(user);
+
+    }
+
+    /**
+     * 删除用户
+     * @param id
+     * @return
+     */
+    public boolean deleteUser(Integer id) {
+        int flag =userMapper.deleteByPrimaryKey(id);
+        System.out.println("deleteflag:"+flag);
+        if(flag!=0) return true;
+        return false;
     }
 }

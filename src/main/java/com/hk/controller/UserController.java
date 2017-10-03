@@ -10,12 +10,17 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class UserController {
@@ -23,28 +28,112 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    /**
+     * 获取所有用户信息
+     * @param pageNum 页数
+     * @param searchString 搜索字符串
+     * @return
+     */
+    @ResponseBody
     @RequestMapping("/getAllUsers")
-    public String getAllUsers(@RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum, Model model){
+    public Message getAllUsers(@RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum,@RequestParam(value = "searchString",defaultValue = "")String searchString){
         PageHelper.startPage(pageNum,5);
         //之后的查询即为分页查询
-        List<User> userList= userService.getAllUsers();
+        List<User> userList= userService.getAllUsersWithSearch(searchString);
         //使用pageInfo包装结果
         PageInfo pageInfo =new PageInfo(userList,5);
-        Message message = Message.success().add("pageInfo",pageInfo);
-        model.addAttribute("message",message);
-        return "index";
+        return  Message.success().add("pageInfo",pageInfo);
     }
 
+    /**
+     * 添加用户
+     * @param user 用户对象
+     * @param result 返回相关错误的对象
+     * @return
+     */
     @RequestMapping("/addUser")
     @ResponseBody
-    public Message addUser(User user){
+    public Message addUser(@Valid User user , BindingResult result){
+        //检测用户名是否重复
+        Message message =checkLoginName(user.getLoginName());
+        if(message.getCode()==200){
+            return Message.fail().add("loginName","用户名已存在");
+        }
         System.out.println(user.toString());
-        boolean flag =userService.addUser(user);
-        if(flag)
-        return Message.success();
+        if(result.hasErrors()){
+            //保存错误信息
+            Map<String,Object> map =new HashMap<String,Object>();
+            List<FieldError> fieldErrors = result.getFieldErrors();
+            for(FieldError fieldError:fieldErrors){
+                System.out.println("错误的字段名："+fieldError.getField());
+                System.out.println("错误的信息："+fieldError.getDefaultMessage());
+                map.put(fieldError.getField(),fieldError.getDefaultMessage());
+            }
+            return Message.fail().add("errorFields",map);
+        }else{
+            boolean flag =userService.addUser(user);
+            if(flag) return Message.success();
+        }
         return Message.fail();
     }
 
+    /**
+     * 通过id获取用户详细信息
+     * @param id
+     * @return
+     */
+    @RequestMapping("/getUser")
+    @ResponseBody
+    public Message getUser(@RequestParam(value = "id") Integer id){
+        User user =userService.getUser(id);
+        return Message.success().add("user",user);
+    }
+
+    /**
+     * 更新用户信息
+     * @param user
+     * @param result
+     * @return
+     */
+    @RequestMapping("/updateUser")
+    @ResponseBody
+    public Message updateUser(@Valid User user , BindingResult result){
+        System.out.println(user.toString());
+        if(result.hasErrors()){
+            //保存错误信息
+            Map<String,Object> map =new HashMap<String,Object>();
+            List<FieldError> fieldErrors = result.getFieldErrors();
+            for(FieldError fieldError:fieldErrors){
+                System.out.println("错误的字段名："+fieldError.getField());
+                System.out.println("错误的信息："+fieldError.getDefaultMessage());
+                map.put(fieldError.getField(),fieldError.getDefaultMessage());
+            }
+            return Message.fail().add("errorFields",map);
+        }else{
+            userService.updateUser(user);
+            return Message.success();
+        }
+    }
+
+    /**
+     * 删除用户
+     * @param id
+     * @return
+     */
+    @RequestMapping("/deleteUser")
+    @ResponseBody
+    public Message deleteUser(@RequestParam(value = "userId")Integer  id ){
+        boolean flag =userService.deleteUser(id);
+        if(flag) return Message.success();
+        return Message.fail();
+    }
+
+
+    /**
+     * 判断用户名是否相同
+     * @param loginName
+     * @return
+     */
     @RequestMapping("/checkLoginName")
     @ResponseBody
     public Message checkLoginName(@RequestParam(value = "loginName")String loginName){
@@ -55,20 +144,20 @@ public class UserController {
 
 
     /**
-     *
+     *测试。。。
      * @param pageNum
      * @return
      */
-    @RequestMapping("/test")
-    @ResponseBody
-    public Message test123(@RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum){
-        PageHelper.startPage(pageNum,5);
+  //  @RequestMapping("/test")
+ //   @ResponseBody
+  //  public Message test123(@RequestParam(value = "pageNum",defaultValue = "1")Integer pageNum){
+  //      PageHelper.startPage(pageNum,5);
         //之后的查询即为分页查询
-        List<User> userList= userService.getAllUsers();
+   //     List<User> userList= userService.getAllUsers();
         //使用pageInfo包装结果
-        PageInfo pageInfo =new PageInfo(userList,5);
-        return Message.success().add("pageInfo",pageInfo);
-    }
+   //     PageInfo pageInfo =new PageInfo(userList,5);
+   //     return Message.success().add("pageInfo",pageInfo);
+ //   }
 
 
 }

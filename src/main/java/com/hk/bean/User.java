@@ -1,18 +1,34 @@
 package com.hk.bean;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.*;
+
 public class User {
     private Integer userId;
 
     private String name;
 
+    @NotBlank(message = "用户名不能为空")
+    @NotNull(message = "用户名不能为空")
     private String loginName;
 
+    @NotBlank(message = "密码不能为空")
+    @NotNull(message = "密码不能为空")
     private String loginPass;
 
+    @NotNull(message = "年龄不能为空")
+    @Digits(integer =150, fraction =1 )
+    @Max(value = 150,message = "非法年龄")
+    @Min(value=1 ,message = "非法年龄")
     private Integer age;
 
     private String sex;
 
+    @NotBlank(message = "邮箱不能为空")
+    @NotNull(message="邮箱不能为空")
+    @Pattern(regexp = "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$",message = "邮箱格式不正确")
     private String email;
 
     public Department getDepartment() {

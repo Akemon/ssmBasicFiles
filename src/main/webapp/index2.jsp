@@ -17,6 +17,120 @@
 </head>
 <body>
 <script type="text/javascript">
+    <!--获取所有用户信息 -->
+    $(document).ready(function () {
+        //alert("进入初始化");
+        toPage(1);
+        })
+    //页面跳转
+    function toPage(pageNum) {
+        var searchString =$("#searchString").val();
+        $.ajax({
+            url:"http://localhost:8080/getAllUsers",
+            type:"POST",
+            data:"pageNum="+pageNum+"&searchString="+searchString,
+            success:function (result) {
+                console.log(result);
+                //显示用户信息
+                showUserMessages(result);
+                //显示分布信息
+                showSplitPageMessage(result);
+                //显示页码信息
+                showPagesMessage(result);
+            }
+        })
+    }
+
+    //显示用户信息
+    function showUserMessages(result) {
+
+        $("#user_table tbody").empty();
+        var users =result.extend.pageInfo.list;
+        $.each(users,function (index,item) {
+          //  alert(item.name);
+            var checkbox =$("<th></th>").append($("<input></input>").prop("type","checkbox").addClass("check_item"));
+            var id =$("<th></th>").append(item.userId);
+            var name =$("<th></th>").append(item.name);
+            var loginName=$("<th></th>").append(item.loginName);
+            var age=$("<th></th>").append(item.age);
+            var sex=$("<th></th>").append(item.sex);
+            var email=$("<th></th>").append(item.email);
+            var department=$("<th></th>").append(item.department.deptName);
+            var edidBtn=$("<button></button>").addClass("btn btn-primary btn-sm editBtn").attr("data-toggle","modal").attr("data-target","#updateUser").attr("user_ID",item.userId)
+                .append($("<span><span>").addClass("glyphicon glyphicon-pencil")).append("编辑");
+            var deleBtn =$("<button></button>").addClass("btn btn-danger btn-sm deleBtn").attr("user_ID",item.userId)
+                .append($("<span><span>").addClass("glyphicon glyphicon-trash")).append("删除");
+            $("<tr></tr>").append(checkbox)
+                .append(id)
+                .append(name)
+                .append(loginName)
+                .append(age)
+                .append(sex)
+                .append(email)
+                .append(department)
+                .append(edidBtn)
+                .append(deleBtn)
+                .appendTo("#user_table tbody");
+        })
+    }
+
+    //显示分布信息
+    function showSplitPageMessage(result) {
+        $("#show_page_basicInfo").empty();
+        var currentPageNum = result.extend.pageInfo.pageNum;
+        var allPageNum =result.extend.pageInfo.pages;
+        var allDataNum =result.extend.pageInfo.total;
+        var elementVal ="当前第"+currentPageNum+"页，总共"+allPageNum+"页，共有"+allDataNum+"条数据";
+        $("#show_page_basicInfo").html(elementVal);
+    }
+    //显示页码信息
+    function showPagesMessage(result) {
+        $("#show_ul_Info").empty();
+        var ul =$("#show_ul_Info");
+        var firstElement =$("<li></li>").append($("<a></a>").prop("href","#").append("首页"));
+        var preElement =$("<li></li>").append($("<a></a>").prop("href","#").append("&laquo;"));
+      //当前为第一页
+        if(result.extend.pageInfo.isFirstPage){
+            firstElement.addClass("disabled");
+            preElement.addClass("disabled");
+        }else{
+            //添加点击事件
+            firstElement.click(function () {
+                toPage(1);
+            })
+            preElement.click(function () {
+                toPage(result.extend.pageInfo.pageNum-1);
+            })
+        }
+        ul.append(firstElement).append(preElement);
+        $.each(result.extend.pageInfo.navigatepageNums,function (index,item) {
+            var numLi =$("<li></li>").append($("<a></a>").prop("href","#").append(item));
+            if(result.extend.pageInfo.pageNum==item){
+                numLi.addClass("active");
+            }
+            numLi.click(function () {
+                toPage(item);
+            })
+            ul.append(numLi);
+        })
+        var nextElement =$("<li></li>").append($("<a></a>").prop("href","#").append("&raquo;"));
+        var lastElement = $("<li></li>").append($("<a></a>").prop("href","#").append("末页"));
+        //当前为最后一页
+        if(result.extend.pageInfo.isLastPage){
+            nextElement.addClass("disabled");
+            lastElement.addClass("disabled");
+        }else{
+            //添加点击事件
+            nextElement.click(function () {
+                toPage(result.extend.pageInfo.pageNum+1);
+            })
+            lastElement.click(function () {
+                toPage(result.extend.pageInfo.pages);
+            })
+        }
+        ul.append(nextElement);
+        ul.append(lastElement);
+    }
 
 
     <!--获取所有部门-->
@@ -66,7 +180,22 @@
 
 
     }
+    <!--编辑按钮的事件-->
+    $(document).on("click",".editBtn",function () {
 
+        var userID =$(this).attr("user_ID");
+        //alert(userID);
+        //获取所有部门信息
+        getAllDepts('#updateUser',userID);
+    })
+    <!--删除按钮的事件-->
+    $(document).on("click",".deleBtn",function () {
+
+        var userID =$(this).attr("user_ID");
+       // alert(userID);
+        //删除用户
+        DeleteUser(userID);
+    })
 
     <!--清空表单样式与内容-->
     function  cleanAddUserForm(ele) {
@@ -166,16 +295,7 @@
     
     <!-- 模糊查询-->
     function searchUser() {
-        var searchString =$("#searchString").val();
-        $.ajax({
-            url:"http://localhost:8080/getAllUsers",
-            data:"searchString="+searchString,
-            type:"POST",
-            success:function (result) {
-                alert("查询成功")
-                console.log(result);
-            }
-        })
+       toPage(1);
     }
 
 
@@ -320,7 +440,8 @@
     <!-- 显示表格数据-->
     <div class="row">
         <div class="col-md-12">
-            <table class="table table-hover">
+            <table class="table table-hover" id="user_table">
+                <thead>
                 <tr>
                     <th><input type="checkbox" id="check_all"/></th>
                     <th>id</th>
@@ -332,28 +453,14 @@
                     <th>部门</th>
                     <th>操作</th>
                 </tr>
-                <c:forEach items="${message.extend.pageInfo.list}" var="user">
-                    <tr>
-                        <th> <input type="checkbox" class="check_item"/></th>
-                        <th>${user.userId}</th>
-                        <th>${user.name}</th>
-                        <th>${user.loginName}</th>
-                        <th>${user.age}</th>
-                        <th>${user.sex}</th>
-                        <th>${user.email}</th>
-                        <th>${user.department.deptName}</th>
-                        <th>
-                            <button class="btn btn-primary btn-sm"  data-toggle="modal" data-target="#updateUser" onclick="getAllDepts('#updateUser',${user.userId})">
-                                <span class="glyphicon glyphicon-pencil" ></span>
-                                编辑</button>
-                            <button class="btn btn-danger btn-sm" onclick="DeleteUser(${user.userId})">
-                                <span class="glyphicon glyphicon-trash" ></span>
-                                删除</button>
 
-                        </th>
-                    </tr>
+                </thead>
+                <tbody>
 
-                </c:forEach>
+
+                </tbody>
+
+
 
             </table>
         </div>
@@ -361,32 +468,13 @@
     </div>
     <!-- 显示分布信息-->
     <div class="row">
-        <div class="col-md-6">
-            当前第${message.extend.pageInfo.pageNum}页,总共${message.extend.pageInfo.pages}页,总共${message.extend.pageInfo.total}条纪录
+        <div class="col-md-6" id="show_page_basicInfo">
+
         </div>
         <div class="col-md-6">
 
-            <ul class="pagination">
+            <ul class="pagination" id="show_ul_Info">
 
-                <li><a href="/getAllUsers?pageNum=1">首页</a></li>
-                <c:if test="${!message.extend.pageInfo.isFirstPage}">
-                    <li><a href="/getAllUsers?pageNum=${message.extend.pageInfo.pageNum-1}">&laquo;</a></li>
-                </c:if>
-
-                <c:forEach items="${message.extend.pageInfo.navigatepageNums}" var="page_Num">
-                    <c:if test="${page_Num==message.extend.pageInfo.pageNum}">
-                        <li class="active"><a href="#">${page_Num}</a></li>
-                    </c:if>
-                    <c:if test="${page_Num!=message.extend.pageInfo.pageNum}">
-                        <li ><a href="/getAllUsers?pageNum=${page_Num}">${page_Num}</a></li>
-                    </c:if>
-
-                </c:forEach>
-                <c:if test="${!message.extend.pageInfo.isLastPage}">
-                    <li><a href="/getAllUsers?pageNum=${message.extend.pageInfo.pageNum+1}">&raquo;</a></li>
-                </c:if>
-
-                <li><a href="/getAllUsers?pageNum=${message.extend.pageInfo.pages}">末页</a></li>
             </ul>
 
 

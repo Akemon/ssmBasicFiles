@@ -21,9 +21,9 @@ public interface UserMapper {
     List<User> selectByExample(UserExample example);
 
     //带部门信息的查询
-    @Select({"select * from tb_test_user u,tb_test_dept d where u.dept_Id=d.dept_Id"})
+    @Select({"select * from tb_test_user u,tb_test_dept d where u.dept_Id=d.dept_Id and name like concat(concat('%',#{searchString}),'%')"})
     @ResultMap("WithDeptBaseResultMap")
-    List<User> selectAllUserWithDept();
+    List<User> selectAllUserWithDept(@Param("searchString")String searchString);
 
     User selectByPrimaryKey(Integer userId);
 

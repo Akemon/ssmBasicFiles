@@ -24,6 +24,7 @@ public class UserTest {
     @Autowired
     SqlSession sqlSession;
 
+    /*
     @Test
     public void testUserMapper(){
         System.out.println(userMapper);
@@ -36,7 +37,7 @@ public class UserTest {
             System.out.println("姓名："+user.getName());
             System.out.println("部门："+user.getDepartment().getDeptName());
         }
-
+*/
         //插入1000条员工数据
     /*
         UserMapper mapper =sqlSession.getMapper(UserMapper.class);
@@ -46,5 +47,6 @@ public class UserTest {
         }
          */
 
-    }
+ //   }
+
 }
