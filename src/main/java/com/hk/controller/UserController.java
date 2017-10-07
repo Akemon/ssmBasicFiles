@@ -4,8 +4,11 @@ package com.hk.controller;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.hk.bean.Message;
+import com.hk.bean.Role;
 import com.hk.bean.User;
+import com.hk.bean.User_Role;
 import com.hk.service.UserService;
+import com.hk.service.User_RoleService;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,6 +30,10 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    User_RoleService user_roleService;
+
 
     /**
      * 获取所有用户信息
@@ -71,10 +78,12 @@ public class UserController {
             }
             return Message.fail().add("errorFields",map);
         }else{
-            boolean flag =userService.addUser(user);
-            if(flag) return Message.success();
+            //插入用户表
+            userService.addUser(user);
+            //插入身份表
+            user_roleService.add_Role(new User_Role(null,user.getUserId(),user.getUserRoleID()));
+            return Message.success();
         }
-        return Message.fail();
     }
 
     /**
@@ -86,7 +95,8 @@ public class UserController {
     @ResponseBody
     public Message getUser(@RequestParam(value = "id") Integer id){
         User user =userService.getUser(id);
-        return Message.success().add("user",user);
+        List<User_Role> user_roles =user_roleService.getUserRole(id);
+        return Message.success().add("user",user).add("role",user_roles);
     }
 
     /**
@@ -123,9 +133,12 @@ public class UserController {
     @RequestMapping("/deleteUser")
     @ResponseBody
     public Message deleteUser(@RequestParam(value = "userId")Integer  id ){
-        boolean flag =userService.deleteUser(id);
-        if(flag) return Message.success();
-        return Message.fail();
+        //先删除身份
+        user_roleService.deleteUserRole(id);
+        //再删除用户
+        userService.deleteUser(id);
+        return Message.success();
+
     }
 
 

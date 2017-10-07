@@ -4,6 +4,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.*;
+import java.util.List;
 
 public class User {
     private Integer userId;
@@ -56,6 +57,28 @@ public class User {
     private Integer deptId;
 
     private Department department;
+
+    //显示用于展示用户身份的集合
+    private List<Role> roleList;
+
+    //用于保存增加用户时的身份
+    private Integer userRoleID;
+
+    public Integer getUserRoleID() {
+        return userRoleID;
+    }
+
+    public void setUserRoleID(Integer userRoleID) {
+        this.userRoleID = userRoleID;
+    }
+
+    public List<Role> getRoleList() {
+        return roleList;
+    }
+
+    public void setRoleList(List<Role> roleList) {
+        this.roleList = roleList;
+    }
 
     public Integer getUserId() {
         return userId;

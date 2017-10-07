@@ -37,8 +37,7 @@
     <!--配置一个可以批量执行的sqlSession-->
     <bean   id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
             <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
-
-           <!-- <constructor-arg name="executorType" value="BATCH" ></constructor-arg> -->
+        <constructor-arg name="executorType" value="BATCH" ></constructor-arg>
     </bean>
 
 

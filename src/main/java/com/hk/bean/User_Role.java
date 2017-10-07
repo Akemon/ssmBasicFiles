@@ -7,6 +7,15 @@ public class User_Role {
 
     private Integer roleId;
 
+    public User_Role() {
+    }
+
+    public User_Role(Integer id, Integer userId, Integer roleId) {
+        this.id = id;
+        this.userId = userId;
+        this.roleId = roleId;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -31,6 +31,9 @@
 
 
 
+
+
+
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
@@ -130,7 +133,10 @@
       #{loginPass,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, #{sex,jdbcType=VARCHAR}, 
       #{email,jdbcType=VARCHAR}, #{deptId,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.hk.bean.User">
+  <insert id="insertSelective" parameterType="com.hk.bean.User" keyProperty="userId">
+    <selectKey keyProperty='userId' resultType='int' order='AFTER'  >
+      select LAST_INSERT_ID();
+    </selectKey>
     insert into tb_test_user
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="userId != null">

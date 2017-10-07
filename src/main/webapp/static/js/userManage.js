@@ -120,6 +120,22 @@ function  getAllDepts(ele,id) {
     //清空表单内容与样式(增加用户时)
     if(ele=='#addUser'){
         cleanAddUserForm('#addUser form');
+
+        //发送请求获取身份
+        $.ajax({
+            url:"http://localhost:8080/getAllRoles",
+            type:"POST",
+            async : false,
+            success:function (result) {
+                // console.log(result);
+                $(ele+' select:last').empty();
+                $.each(result.extend.roles,function (index,item) {
+                    //    alert(item);
+                    var selectOption= $("<option></option>").append(item.roleName).attr("value",item.roleId);
+                    selectOption.appendTo(ele+' select:last');
+                })
+            }
+        })
     }
     //发送请求获取所有部门
     $.ajax({
@@ -127,14 +143,20 @@ function  getAllDepts(ele,id) {
         type:"POST",
         async : false,
         success:function (result) {
-            $(ele+' select').empty();
+            $(ele+' select:first').empty();
             $.each(result.extend.depts,function (index,item) {
                 //    alert(item);
                 var selectOption= $("<option></option>").append(item.deptName).attr("value",item.deptId);
-                selectOption.appendTo(ele+' select');
+                selectOption.appendTo(ele+' select:first');
             })
         }
     })
+
+
+
+
+
+
     //如果为编辑，需要再交次发送请求，获取取当前id的信息，填入模态框
     //  alert("id:"+id);
     if(ele=='#updateUser'){
@@ -374,6 +396,10 @@ $(document).on("click",".check_item",function () {
 //全选删除
 $(document).on("click","#delete_all_btn",function () {
     var deleteNumber =$(".check_item:checked").length;
+    if(deleteNumber==0) {
+        alert("请选择要删除的用户");
+        return false;
+    }
     if(confirm("确认删除选中的"+deleteNumber+"个用户吗")){
         $.each($(".check_item:checked"),function () {
             var id = $(this).parents("tr").find("th:eq(1)").text();

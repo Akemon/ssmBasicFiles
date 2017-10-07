@@ -13,7 +13,7 @@
     <script type="text/javascript" src="static/js/jquery-3.2.1.min.js"></script>
     <link rel="stylesheet" href="static/bootstrap-3.3.7-dist/css/bootstrap.css" type="text/css" />
     <script type="text/javascript" src="static/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
-    <script type="text/javascript" src="static/js/myJavascript.js"></script>
+    <script type="text/javascript" src="static/js/userManage.js"></script>
 </head>
 <body>
 
@@ -240,12 +240,21 @@
                     </div>
 
                     <div class="form-group" >
-                        <label for="dept_add_select" class="col-sm-2 control-label">部门</label>
+                    <label for="dept_add_select" class="col-sm-2 control-label">部门</label>
+                    <div class="col-sm-5">
+                        <select class="form-control " name="deptId" id ="dept_add_select">
+                        </select>
+                    </div>
+                </div>
+
+                    <div class="form-group" >
+                        <label for="role_select" class="col-sm-2 control-label">身份</label>
                         <div class="col-sm-5">
-                            <select class="form-control " name="deptId" id ="dept_add_select">
+                            <select class="form-control " name="userRoleID" id ="role_select">
                             </select>
                         </div>
                     </div>
+
 
                 </form>
 

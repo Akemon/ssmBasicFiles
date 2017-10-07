@@ -20,10 +20,11 @@ public interface UserMapper {
 
     List<User> selectByExample(UserExample example);
 
-    //带部门信息的查询
-    @Select({"select * from tb_test_user u,tb_test_dept d where u.dept_Id=d.dept_Id and (name like concat(concat('%',#{searchString}),'%') or dept_Name like concat(concat('%',#{searchString}),'%') or login_Name like concat(concat('%',#{searchString}),'%'))"})
+    //带部门和身份信息的查询
+    @Select({"SELECT * from tb_test_user u,tb_test_dept d where u.dept_Id=d.dept_Id and (name like concat(concat('%',#{searchString}),'%') or dept_Name like concat(concat('%',#{searchString}),'%') or login_Name like concat(concat('%',#{searchString}),'%'))"})
     @ResultMap("WithDeptBaseResultMap")
     List<User> selectAllUserWithDept(@Param("searchString")String searchString);
+
 
     User selectByPrimaryKey(Integer userId);
 
